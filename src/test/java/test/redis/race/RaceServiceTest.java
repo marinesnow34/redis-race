@@ -93,4 +93,25 @@ class RaceServiceTest {
 		countDownLatch.await();
 		assertEquals(100, orderNumbers.size());
 	}
+
+	@Test
+	@DisplayName("레디스 sadd 스크립트 테스트")
+	void redis_sadd_test() throws InterruptedException {
+		ConcurrentHashMap<String, Long> orderNumbers = new ConcurrentHashMap<String, Long>();
+		ExecutorService executorService = Executors.newFixedThreadPool(100);
+		CountDownLatch countDownLatch = new CountDownLatch(100);
+
+		for (int i = 0; i < 100; i++) {
+			executorService.execute(() -> {
+				try {
+					orderNumbers.put(raceService.sadd(), 0L);
+				} finally {
+					countDownLatch.countDown();
+				}
+			});
+		}
+
+		countDownLatch.await();
+		assertEquals(100, orderNumbers.size());
+	}
 }

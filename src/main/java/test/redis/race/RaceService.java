@@ -2,8 +2,10 @@ package test.redis.race;
 
 import java.util.Collections;
 import java.util.Random;
+import java.util.UUID;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -59,5 +61,17 @@ public class RaceService {
 
 		Order order = new Order(newOrderNumber);
 		return orderRepository.save(order).getOrderNumber();
+	}
+
+	public String sadd() {
+		SetOperations<String, String> setOperations = redisTemplate.opsForSet();
+		String uuid = UUID.randomUUID().toString();
+		Long size = setOperations.size("uuids");
+		System.out.println("size1 = " + size);
+		setOperations.add("uuids", uuid);
+		size = setOperations.size("uuids");
+		System.out.println("size2 = " + size);
+		return size.toString();
+		// return uuid;
 	}
 }
